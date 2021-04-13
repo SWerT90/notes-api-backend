@@ -20,14 +20,16 @@ app.use(cors())
 app.use(express.json())
 app.use(logger)
 
+app.use(express.static('build'))
+
 // const app = http.createServer((req, res) => {
 //     res.writeHead(200, { 'Content-Type': 'application/json' })
 //     res.end(JSON.stringify(notes))
 // })
 
-app.get('/', (req, res) => {
-  res.send('<h1>Hello World</h1>')
-})
+// app.get('/', (req, res) => {
+//   res.send('<h1>Hello World</h1>')
+// })
 
 app.get('/api/notes', (req, res, next) => {
   Note.find({})
