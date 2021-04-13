@@ -1,0 +1,7 @@
+PUT http://localhost:3001/api/notes/60733ad73489643314a03718
+Content-Type: application/json
+
+{
+    "content": "Mongo db es la polla",
+    "important": true
+}
