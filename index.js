@@ -1,4 +1,8 @@
-require('dotenv').config()
+const ENV = process.env.ENV || 'DEV'
+
+if (ENV === 'DEV') {
+  require('dotenv').config()
+}
 
 require('./mongo')
 const Note = require('./models/Note')
