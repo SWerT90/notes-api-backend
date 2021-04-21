@@ -1,9 +1,10 @@
 const mongoose = require('mongoose')
 
-const user = process.env.DB_USER
-const password = process.env.DB_PASSWORD
-const dbUrl = process.env.DB_URL
-const connectionString = `mongodb+srv://${user}:${password}@${dbUrl}?retryWrites=true&w=majority`
+const config = require('./utils/config')
+
+const connectionString = config.NODE_ENV === 'test'
+  ? `mongodb+srv://${config.DB_USER}:${config.DB_PASSWORD}@${config.DB_URL_TEST}?retryWrites=true&w=majority`
+  : `mongodb+srv://${config.DB_USER}:${config.DB_PASSWORD}@${config.DB_URL}?retryWrites=true&w=majority`
 
 mongoose.connect(connectionString, {
   useNewUrlParser: true,
