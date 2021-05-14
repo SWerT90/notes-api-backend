@@ -21,23 +21,3 @@ mongoose.connect(connectionString, {
 process.on('uncaught', () => {
   mongoose.connection.disconnect()
 })
-
-// Note.find({}).then(result => {
-//   console.log(result)
-//   mongoose.connection.close()
-// })
-
-// const note = new Note({
-//   content: 'Mongo es la polla',
-//   date: new Date(),
-//   important: true
-// })
-
-// note.save()
-//   .then(result => {
-//     console.log(result)
-//     mongoose.connection.close()
-//   })
-//   .catch(error => {
-//     console.log(error)
-//   })

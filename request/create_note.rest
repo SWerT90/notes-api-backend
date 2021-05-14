@@ -1,8 +1,9 @@
 POST http://localhost:3001/api/notes
 Content-Type: application/json
+Authorization: Bearer 
 
 {
-    "content": "Esto es una nueva nota",
+    "content": "Esto es una nueva nota sobre la fatiga mental",
     "important": true
 }
 

@@ -1,8 +1,16 @@
+const jwt = require('jsonwebtoken')
+
+const config = require('../utils/config')
+
 const notesRouter = require('express').Router()
 const Note = require('../models/Note')
+const User = require('../models/User')
 
 notesRouter.get('/', async (req, res, next) => {
-  const notes = await Note.find({})
+  const notes = await Note.find({}).populate('user', {
+    username: 1,
+    name: 1
+  })
 
   res.json(notes)
   // Note.find({})
@@ -38,22 +46,53 @@ notesRouter.delete('/:id', async (req, res, next) => {
 })
 
 notesRouter.post('/', async (req, res, next) => {
-  const note = req.body
+  const {
+    content,
+    important = false
+  } = req.body
 
-  if (!note || !note.content) {
+  const authorization = req.get('authorization')
+  let token = ''
+
+  if (authorization && authorization.toLocaleLowerCase().startsWith('bearer')) {
+    token = authorization.substring(7)
+  }
+
+  let decodedToken = {}
+
+  try {
+    decodedToken = jwt.verify(token, config.SECRET)
+  } catch (error) {
+    return next(error)
+  }
+
+  // if (!token || !decodedToken.id) {
+  //   return res.status(401).json({ error: 'Unathorized' })
+  // }
+
+  const { id: userId } = decodedToken
+
+  const user = await User.findById(userId)
+
+  if (!content) {
     return res.status(400).json({
-      error: 'Note.content is missing'
+      error: 'Content is missing'
     })
   }
 
   const newNote = new Note({
-    content: note.content,
-    important: typeof note.important !== 'undefined' ? note.important : false,
-    date: new Date().toISOString()
+    content,
+    important,
+    date: new Date().toISOString(),
+    user: user._id
   })
 
   try {
     const savedNote = await newNote.save()
+
+    user.notes = user.notes.concat(savedNote._id)
+    await user.save()
+
     res.status(201).json(savedNote)
   } catch (error) {
     next(error)
