@@ -6,7 +6,10 @@ const ERROR_HANDLER = {
     res.status(404).send({ error: 'Note not found' }),
 
   JsonWebTokenError: res =>
-    res.status(401).send({ error: 'Unathorized' }),
+    res.status(401).send({ error: 'Missing token or invalid' }),
+
+  TokenExpiredError: res =>
+    res.status(401).send({ error: 'Token expired' }),
 
   defaultError: res =>
     res.status(500).end()
@@ -14,8 +17,6 @@ const ERROR_HANDLER = {
 
 module.exports = (error, req, res, next) => {
   console.error(error)
-
-  console.log('Ey en handleerrror')
 
   if (error.errors !== undefined && error.errors.username !== undefined) {
     res.status(400).send({

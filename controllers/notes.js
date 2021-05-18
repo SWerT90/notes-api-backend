@@ -1,10 +1,8 @@
-const jwt = require('jsonwebtoken')
-
-const config = require('../utils/config')
-
 const notesRouter = require('express').Router()
 const Note = require('../models/Note')
 const User = require('../models/User')
+
+const userExtractor = require('../middleware/userExtractor')
 
 notesRouter.get('/', async (req, res, next) => {
   const notes = await Note.find({}).populate('user', {
@@ -30,7 +28,7 @@ notesRouter.get('/:id', (req, res, next) => {
   }).catch(error => { next(error) })
 })
 
-notesRouter.delete('/:id', async (req, res, next) => {
+notesRouter.delete('/:id', userExtractor, async (req, res, next) => {
   const id = req.params.id
 
   try {
@@ -45,32 +43,12 @@ notesRouter.delete('/:id', async (req, res, next) => {
   //   .catch(error => { next(error) })
 })
 
-notesRouter.post('/', async (req, res, next) => {
+notesRouter.post('/', userExtractor, async (req, res, next) => {
   const {
     content,
-    important = false
+    important = false,
+    userId
   } = req.body
-
-  const authorization = req.get('authorization')
-  let token = ''
-
-  if (authorization && authorization.toLocaleLowerCase().startsWith('bearer')) {
-    token = authorization.substring(7)
-  }
-
-  let decodedToken = {}
-
-  try {
-    decodedToken = jwt.verify(token, config.SECRET)
-  } catch (error) {
-    return next(error)
-  }
-
-  // if (!token || !decodedToken.id) {
-  //   return res.status(401).json({ error: 'Unathorized' })
-  // }
-
-  const { id: userId } = decodedToken
 
   const user = await User.findById(userId)
 
@@ -103,7 +81,7 @@ notesRouter.post('/', async (req, res, next) => {
   //   .catch(error => next(error))
 })
 
-notesRouter.put('/:id', (req, res, next) => {
+notesRouter.put('/:id', userExtractor, (req, res, next) => {
   const newNoteInfo = req.body
   const id = req.params.id
 
